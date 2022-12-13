@@ -21,18 +21,18 @@ public class CasosDePrueba {
 
     private JavascriptExecutor js;
 
-    private String rutaDriver= System.getProperty("user.dir")+"\\src\\test\\resources\\drivers\\chromedriver.exe";
+    private String rutaDriver = System.getProperty("user.dir") + "\\src\\test\\resources\\drivers\\chromedriver.exe";
     private String propertyDriver = "webdriver.chrome.driver";
 
     @AfterMethod
-    public void posCondicion(){
+    public void posCondicion() {
         driver.close();
     }
 
     @BeforeMethod
-    public void preCondiciones(){
+    public void preCondiciones() {
 
-        System.setProperty(propertyDriver,rutaDriver);
+        System.setProperty(propertyDriver, rutaDriver);
 
         driver = new ChromeDriver();
 
@@ -40,7 +40,7 @@ public class CasosDePrueba {
 
         driver.manage().timeouts().setScriptTimeout(40, TimeUnit.SECONDS);
 
-        wait = new WebDriverWait(driver,10);
+        wait = new WebDriverWait(driver, 10);
 
         js = (JavascriptExecutor) driver;
 
@@ -50,7 +50,7 @@ public class CasosDePrueba {
     }
 
     @Test
-    public void CP001_Registro_Fallido_Captcha_en_blanco() {
+    public void CP001_Contraseña_muy_corta() {
 
         By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
 
@@ -58,24 +58,29 @@ public class CasosDePrueba {
 
         btnRegistrarse.click();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("domingo.saavedra@tsoftglobal.com");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("espeche.jenifer@tsoftglobal.com");
 
-        driver.findElement(By.name("confirm")).sendKeys("domingo.saavedra@tsoftglobal.com");
+        driver.findElement(By.name("confirm")).sendKeys("espeche.jenifer@tsoftglobal.com");
 
-        driver.findElement(By.name("password")).sendKeys("123454321");
+        driver.findElement(By.name("password")).sendKeys("123");
 
-        driver.findElement(By.name("displayname")).sendKeys("Pobre Domingo :D");
+        driver.findElement(By.name("displayname")).sendKeys("Yuyo");
 
-        driver.findElement(By.id("day")).sendKeys("28");
+        driver.findElement(By.id("day")).sendKeys("3");
 
         Select cmbMes = new Select(driver.findElement(By.id("month")));
 
-        cmbMes.selectByValue("02");
+        cmbMes.selectByValue("09");
 
-        driver.findElement(By.name("year")).sendKeys("1991");
+        driver.findElement(By.name("year")).sendKeys("1994");
 
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
 
-        driver.findElement(By.xpath("//label[@for='gender_option_male']")).click();
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
+
+        optionFemale.click();
+
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
 
         driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
 
@@ -83,18 +88,57 @@ public class CasosDePrueba {
         driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
 
 
-        WebElement btnRegistro  = driver.findElement(By.xpath("//button[@type='submit']"));
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Tu contraseña es demasiado corta.");
 
-        js.executeScript("arguments[0].scrollIntoView();", btnRegistro);
+    }
 
-        btnRegistro.click();
 
-        Assert.assertEquals(driver.findElement(By.xpath("//div[contains(text(),'Confirma que no eres un robot.')]")).getText(),"Confirma que no eres un robot.");
+
+    @Test
+    public void CP002_Mail_Incorrecto() {
+
+        By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
+
+        WebElement btnRegistrarse = driver.findElement(localizadorBtnRegistrase);
+
+        btnRegistrarse.click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("@tsoftglobal.com");
+
+        driver.findElement(By.name("confirm")).sendKeys("espeche.jenifer@tsoftglobal.com");
+
+        driver.findElement(By.name("password")).sendKeys("123456789");
+
+        driver.findElement(By.name("displayname")).sendKeys("Yuyo");
+
+        driver.findElement(By.id("day")).sendKeys("3");
+
+        Select cmbMes = new Select(driver.findElement(By.id("month")));
+
+        cmbMes.selectByValue("09");
+
+        driver.findElement(By.name("year")).sendKeys("1994");
+
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
+
+        optionFemale.click();
+
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
+
+
+        driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
+
+
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Este correo electrónico no es válido. Asegúrate de que tenga un formato como este: ejemplo@email.com");
 
     }
 
     @Test
-    public void CP002_Registro_Fallido_Captcha_en_blanco() {
+    public void CP003_Mail_No_Coincide() {
 
         By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
 
@@ -102,41 +146,163 @@ public class CasosDePrueba {
 
         btnRegistrarse.click();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("domingo.saavedra@tsoftglobal.com");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("espeche@tsoftglobal.com");
 
-        driver.findElement(By.name("confirm")).sendKeys("domingo.saedra@tsoftglobal.com");
+        driver.findElement(By.name("confirm")).sendKeys("espeche.jenifer@tsoftglobal.com");
 
-        driver.findElement(By.name("password")).sendKeys("123454321");
+        driver.findElement(By.name("password")).sendKeys("123456789");
 
-        driver.findElement(By.name("displayname")).sendKeys("Pobre Domingo :D");
+        driver.findElement(By.name("displayname")).sendKeys("Yuyo");
 
-        driver.findElement(By.id("day")).sendKeys("28");
+        driver.findElement(By.id("day")).sendKeys("3");
 
         Select cmbMes = new Select(driver.findElement(By.id("month")));
 
-        cmbMes.selectByValue("02");
+        cmbMes.selectByValue("09");
 
+        driver.findElement(By.name("year")).sendKeys("1994");
 
-        driver.findElement(By.name("year")).sendKeys("1991");
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
 
-        WebElement optionMale = driver.findElement(By.xpath("//label[@for='gender_option_male']"));
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
 
-        js.executeScript("arguments[0].scrollIntoView();", optionMale);
+        optionFemale.click();
 
-
-        optionMale.click();
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
 
         driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
 
 
         driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
 
-        WebElement btnRegistro  = driver.findElement(By.xpath("//button[@type='submit']"));
 
-        js.executeScript("arguments[0].scrollIntoView();", btnRegistro);
-
-        btnRegistro.click();
-
-        Assert.assertEquals(driver.findElement(By.xpath("//div[contains(text(),'Las direcciones de correo')]")).getText(),"Las direcciones de correo electrónico no coinciden.");
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Las direcciones de correo electrónico no coinciden.");
     }
+
+    @Test
+    public void CP004_CampoVacio() {
+
+        By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
+
+        WebElement btnRegistrarse = driver.findElement(localizadorBtnRegistrase);
+
+        btnRegistrarse.click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("confirm")).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("password")).sendKeys("123456789lkjA");
+
+        driver.findElement(By.name("displayname")).sendKeys("");
+
+        driver.findElement(By.id("day")).sendKeys("3");
+
+        Select cmbMes = new Select(driver.findElement(By.id("month")));
+
+        cmbMes.selectByValue("09");
+
+        driver.findElement(By.name("year")).sendKeys("1994");
+
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
+
+        optionFemale.click();
+
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
+
+
+        driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
+
+
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Indica un nombre para tu perfil.");
+    }
+
+    @Test
+    public void CP005_DiaValido() {
+
+        By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
+
+        WebElement btnRegistrarse = driver.findElement(localizadorBtnRegistrase);
+
+        btnRegistrarse.click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("confirm")).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("password")).sendKeys("123456789lkjA");
+
+        driver.findElement(By.name("displayname")).sendKeys("cheni");
+
+        driver.findElement(By.id("day")).sendKeys("a");
+
+        Select cmbMes = new Select(driver.findElement(By.id("month")));
+
+        cmbMes.selectByValue("09");
+
+        driver.findElement(By.name("year")).sendKeys("1994");
+
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
+
+        optionFemale.click();
+
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
+
+
+        driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
+
+
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Indica un día válido del mes.");
+    }
+
+    @Test
+    public void CP006_crear() {
+
+        By localizadorBtnRegistrase = By.xpath("//button[contains(text(),'Registrarte')]");
+
+        WebElement btnRegistrarse = driver.findElement(localizadorBtnRegistrase);
+
+        btnRegistrarse.click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("confirm")).sendKeys("espeche@tsoftglobal.com");
+
+        driver.findElement(By.name("password")).sendKeys("123456789lkjA");
+
+        driver.findElement(By.name("displayname")).sendKeys("cheni");
+
+        driver.findElement(By.id("day")).sendKeys("a");
+
+        Select cmbMes = new Select(driver.findElement(By.id("month")));
+
+        cmbMes.selectByValue("09");
+
+        driver.findElement(By.name("year")).sendKeys("1994");
+
+        WebElement optionFemale = driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        js.executeScript("arguments[0].scrollIntoView();", optionFemale);
+
+        optionFemale.click();
+
+        driver.findElement(By.xpath("//label[@for='gender_option_female']"));
+
+        driver.findElement(By.xpath("//label[@for='marketing-opt-checkbox']")).click();
+
+
+        driver.findElement(By.xpath("//label[@for='third-party-checkbox']")).click();
+
+
+        Assert.assertEquals(driver.findElement(By.xpath("//div[@aria-label='Indicador de error']")).getText(), "Indica un día válido del mes.");
+    }
+
 }
